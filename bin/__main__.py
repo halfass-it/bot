@@ -15,6 +15,7 @@ class Main:
     bot = Bot(self.ip, self.port, self.cache_dir)
     bot.start()
 
+
 def main():
   try:
     CLI(Main)
