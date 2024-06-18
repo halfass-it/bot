@@ -1,0 +1,37 @@
+name: Notify Discord
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, closed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Send notification to Discord
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        if [ "${{ github.event_name }}" = "push" ]; then
+          REPO="${{ github.repository }}"
+          BRANCH=$(echo "${{ github.ref }}" | sed 's/refs\/heads\///')
+          AUTHOR="${{ github.actor }}"
+          COMMIT_URL="${{ github.event.compare }}"
+          MESSAGE="**Repository:** $REPO\n**Branch:** $BRANCH\n**Commits:** $COMMIT_COUNT\n**Author:** $AUTHOR\n[Compare Changes]($COMMIT_URL)"
+        elif [ "${{ github.event_name }}" = "pull_request" ]; then
+          REPO="${{ github.repository }}"
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          PR_URL="${{ github.event.pull_request.html_url }}"
+          ACTION="${{ github.event.action }}"
+          AUTHOR="${{ github.actor }}"
+          MESSAGE="\n\n**Repository:** $REPO\n**Pull Request:** [$PR_TITLE]($PR_URL)\n**Action:** $ACTION\n**Author:** $AUTHOR"
+        fi
+
+        curl -H "Content-Type: application/json" \
+             -d "{\"content\": \"$MESSAGE\"}" \
+             $DISCORD_WEBHOOK_URL
+
