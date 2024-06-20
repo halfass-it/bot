@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from jsonargparse import CLI
 
@@ -6,13 +7,12 @@ from bot.bot import Bot
 
 
 class Main:
-  def __init__(self, ip: str, port: str, cache_dir: str) -> None:
-    self.ip: str = ip
-    self.port: int = int(port)
-    self.cache_dir: str = cache_dir
+  def __init__(self, discord_token: str, cache_dir: str) -> None:
+    self.discord_token: str = discord_token
+    self.cache_dir: Path = Path(cache_dir)
 
   def run(self):
-    bot = Bot(self.ip, self.port, self.cache_dir)
+    bot = Bot(discord_token=self.discord_token, cache_dir=self.cache_dir)
     bot.start()
 
 

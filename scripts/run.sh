@@ -10,4 +10,4 @@ if [ ! -d "$VENV" ]; then
     $POETRY install
 fi
 
-$POETRY run main "127.0.0.1" "4156" "$CACHE"
+$POETRY run main $DISCORD_BOT_TOKEN $CACHE run
