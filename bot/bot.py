@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
-import json
+import subprocess
 import time
 import io
+import os
 
 import psutil
 import discord
@@ -78,6 +79,12 @@ async def mon(ctx):
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
         raise Exception(f"Detailed error: {str(e)}")
+
+@DISCORD_BOT.command()
+async def logs(ctx):
+  path: Path = Path(f"{os.getenv('XDG_CACHE_HOME', '')}/halfass-it") / "logs"
+  logs: str = subprocess.run(["cat", f"{path}/*.log", "|", "grep", "'ERROR'", "|", "less"], capture_output=True, text=True) 
+  await ctx.send(logs.stdout or "no errors found in logs")
 
 @DISCORD_BOT.command()
 async def ping(ctx):
