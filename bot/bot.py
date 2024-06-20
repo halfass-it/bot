@@ -19,7 +19,7 @@ def get_system_info():
     net = psutil.net_io_counters()
     for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
         proc.cpu_percent(interval=None)
-    time.sleep(5)
+    time.sleep(1)
     processes = []
     for proc in sorted(psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']), 
                        key=lambda x: x.info['cpu_percent'], 
@@ -68,10 +68,9 @@ DISCORD_BOT = commands.Bot(command_prefix='/', intents=intents)
 @DISCORD_BOT.command()
 async def mon(ctx):
     try:
+        await ctx.send("monitoring server stats...")
         system_info = get_system_info()
         image = create_image(system_info)
-
-        # Save image to a BytesIO object
         with io.BytesIO() as image_binary:
             image.save(image_binary, 'PNG')
             image_binary.seek(0)
@@ -79,7 +78,15 @@ async def mon(ctx):
     except Exception as e:
         await ctx.send(f"An error occurred: {str(e)}")
         raise Exception(f"Detailed error: {str(e)}")
-    
+
+@DISCORD_BOT.command()
+async def ping(ctx):
+    await ctx.send('pong')
+
+@DISCORD_BOT.command()
+async def kys(ctx):
+    await ctx.send('.|.')
+
 @dataclass
 class Bot:
   discord_token: str
