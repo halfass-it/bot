@@ -27,7 +27,7 @@ def get_system_info():
     psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']),
     key=lambda x: x.info['cpu_percent'],
     reverse=True,
-  )[:5]:
+  )[:8]:
     processes.append({
       'pid': proc.info['pid'],
       'name': proc.info['name'],
@@ -91,7 +91,7 @@ DISCORD_BOT = commands.Bot(command_prefix='/', intents=intents)
 @DISCORD_BOT.command()
 async def mon(ctx):
   try:
-    await ctx.send('monitoring server stats...')
+    await ctx.send('monitoring server ...')
     system_info = get_system_info()
     image = create_image(system_info)
     with io.BytesIO() as image_binary:
@@ -107,19 +107,19 @@ async def mon(ctx):
 async def logs(ctx):
     path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
     if not path.exists():
-        await ctx.send("Log path does not exist.")
+        await ctx.send("log path does not exist.")
         return
     try:
         logs = subprocess.run(
             f"cat {path}/*.log | grep 'ERROR'",
             shell=True, capture_output=True, text=True
         )
-        output = logs.stdout or 'No errors found in logs'
+        output = logs.stdout or 'no errors found in logs'
         if len(output) > 2000:
-            output = output[:1997] + '...'
+            output = '...' + output[-1984:]
         await ctx.send(f"```\n{output}\n```")
     except Exception as e:
-        await ctx.send(f"An error occurred: {str(e)}")
+        await ctx.send(f"error occurred: {str(e)}")
 
 @DISCORD_BOT.command()
 async def ping(ctx):
