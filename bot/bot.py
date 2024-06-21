@@ -105,12 +105,21 @@ async def mon(ctx):
 
 @DISCORD_BOT.command()
 async def logs(ctx):
-  path: Path = Path(f"{os.getenv('XDG_CACHE_HOME', '')}/halfass-it") / 'logs'
-  logs: str = subprocess.run(
-    ['cat', f'{path}/*.log', '|', 'grep', "'ERROR'", '|', 'less'], capture_output=True, text=True
-  )
-  await ctx.send(logs.stdout or 'no errors found in logs')
-
+    path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
+    if not path.exists():
+        await ctx.send("Log path does not exist.")
+        return
+    try:
+        logs = subprocess.run(
+            f"cat {path}/*.log | grep 'ERROR'",
+            shell=True, capture_output=True, text=True
+        )
+        output = logs.stdout or 'No errors found in logs'
+        if len(output) > 2000:
+            output = output[:1997] + '...'
+        await ctx.send(f"```\n{output}\n```")
+    except Exception as e:
+        await ctx.send(f"An error occurred: {str(e)}")
 
 @DISCORD_BOT.command()
 async def ping(ctx):
