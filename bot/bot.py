@@ -19,7 +19,12 @@ def get_system_info():
   mem = psutil.virtual_memory()
   disk = psutil.disk_usage('/')
   net = psutil.net_io_counters()
-  for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+  for proc in psutil.process_iter([
+    'pid',
+    'name',
+    'cpu_percent',
+    'memory_percent',
+  ]):
     proc.cpu_percent(interval=None)
   time.sleep(1)
   processes = []
@@ -36,8 +41,17 @@ def get_system_info():
     })
   return {
     'cpu': {'total': cpu},
-    'mem': {'total': mem.total, 'available': mem.available, 'percent': mem.percent},
-    'disk': {'total': disk.total, 'used': disk.used, 'free': disk.free, 'percent': disk.percent},
+    'mem': {
+      'total': mem.total,
+      'available': mem.available,
+      'percent': mem.percent,
+    },
+    'disk': {
+      'total': disk.total,
+      'used': disk.used,
+      'free': disk.free,
+      'percent': disk.percent,
+    },
     'network': {'bytes_sent': net.bytes_sent, 'bytes_recv': net.bytes_recv},
     'top_processes': processes,
   }
@@ -45,7 +59,11 @@ def get_system_info():
 
 def draw_bar(draw, x, y, width, height, percent, color):
   draw.rectangle([x, y, x + width, y + height], outline='black', fill='grey')
-  draw.rectangle([x, y, x + int(width * (percent / 100)), y + height], outline='black', fill=color)
+  draw.rectangle(
+    [x, y, x + int(width * (percent / 100)), y + height],
+    outline='black',
+    fill=color,
+  )
 
 
 def create_image(system_info):
@@ -54,11 +72,26 @@ def create_image(system_info):
   draw = ImageDraw.Draw(image)
   font = ImageFont.load_default()
   text_color = (255, 255, 255)
-  draw.text((10, 10), f"CPU Usage: {system_info['cpu']['total']}%", font=font, fill=text_color)
+  draw.text(
+    (10, 10),
+    f"CPU Usage: {system_info['cpu']['total']}%",
+    font=font,
+    fill=text_color,
+  )
   draw_bar(draw, 10, 30, 780, 20, system_info['cpu']['total'], 'red')
-  draw.text((10, 60), f"Memory Usage: {system_info['mem']['percent']}%", font=font, fill=text_color)
+  draw.text(
+    (10, 60),
+    f"Memory Usage: {system_info['mem']['percent']}%",
+    font=font,
+    fill=text_color,
+  )
   draw_bar(draw, 10, 80, 780, 20, system_info['mem']['percent'], 'blue')
-  draw.text((10, 110), f"Disk Usage: {system_info['disk']['percent']}%", font=font, fill=text_color)
+  draw.text(
+    (10, 110),
+    f"Disk Usage: {system_info['disk']['percent']}%",
+    font=font,
+    fill=text_color,
+  )
   draw_bar(draw, 10, 130, 780, 20, system_info['disk']['percent'], 'green')
   draw.text(
     (10, 160),
@@ -105,21 +138,24 @@ async def mon(ctx):
 
 @DISCORD_BOT.command()
 async def logs(ctx):
-    path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
-    if not path.exists():
-        await ctx.send("log path does not exist.")
-        return
-    try:
-        logs = subprocess.run(
-            f"cat {path}/*.log | grep 'ERROR'",
-            shell=True, capture_output=True, text=True
-        )
-        output = logs.stdout or 'no errors found in logs'
-        if len(output) > 2000:
-            output = '...' + output[-1984:]
-        await ctx.send(f"```\n{output}\n```")
-    except Exception as e:
-        await ctx.send(f"error occurred: {str(e)}")
+  path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
+  if not path.exists():
+    await ctx.send('log path does not exist.')
+    return
+  try:
+    logs = subprocess.run(
+      f"cat {path}/*.log | grep 'ERROR'",
+      shell=True,
+      capture_output=True,
+      text=True,
+    )
+    output = logs.stdout or 'no errors found in logs'
+    if len(output) > 2000:
+      output = '...' + output[-1984:]
+    await ctx.send(f'```\n{output}\n```')
+  except Exception as e:
+    await ctx.send(f'error occurred: {str(e)}')
+
 
 @DISCORD_BOT.command()
 async def ping(ctx):
