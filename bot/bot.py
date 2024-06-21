@@ -140,7 +140,7 @@ async def mon(ctx):
 async def logs(ctx):
   path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
   if not path.exists():
-    await ctx.send('log path does not exist.')
+    await ctx.send('```\nlogs not found\n```')
     return
   try:
     logs = subprocess.run(
@@ -161,7 +161,7 @@ async def logs(ctx):
 async def logerr(ctx):
   path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
   if not path.exists():
-    await ctx.send('log path does not exist.')
+    await ctx.send('```\nlogs not found\n```')
     return
   try:
     logs = subprocess.run(
@@ -175,7 +175,7 @@ async def logerr(ctx):
       output = '...' + output[-1984:]
     await ctx.send(f'```\n{output}\n```')
   except Exception as e:
-    await ctx.send(f'error occurred: {str(e)}')
+    await ctx.send(f'error occurred fetching logs: {str(e)}')
 
 
 @DISCORD_BOT.command()
