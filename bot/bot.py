@@ -135,9 +135,29 @@ async def mon(ctx):
     await ctx.send(f'An error occurred: {str(e)}')
     raise Exception(f'Detailed error: {str(e)}')
 
-
 @DISCORD_BOT.command()
 async def logs(ctx):
+  path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
+  if not path.exists():
+    await ctx.send('log path does not exist.')
+    return
+  try:
+    logs = subprocess.run(
+      f"cat {path}/*.log",
+      shell=True,
+      capture_output=True,
+      text=True,
+    )
+    output = logs.stdout or 'no errors found in logs'
+    if len(output) > 2000:
+      output = '...' + output[-1984:]
+    await ctx.send(f'```\n{output}\n```')
+  except Exception as e:
+    await ctx.send(f'error occurred: {str(e)}')
+
+
+@DISCORD_BOT.command()
+async def logerr(ctx):
   path = Path(os.getenv('XDG_CACHE_HOME', '')) / 'halfass-it' / 'logs'
   if not path.exists():
     await ctx.send('log path does not exist.')
